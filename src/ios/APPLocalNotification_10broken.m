@@ -25,6 +25,7 @@
 #import "APPLocalNotificationOptions.h"
 #import "UIApplication+APPLocalNotification.h"
 #import "UILocalNotification+APPLocalNotification.h"
+@import UserNotifications;
 
 @interface APPLocalNotification ()
 
@@ -691,27 +692,74 @@
  */
 - (void) fireEvent:(NSString*)event notification:(UILocalNotification*)notification
 {
-    NSString* js;
-    NSString* params = [NSString stringWithFormat:
-                        @"\"%@\"", self.applicationState];
+    
+    if (IsAtLeastiOSVersion(@"10.0")) {
+        UNMutableNotificationContent *content = [[UNMutableNotificationContent alloc] init];
+        content.title = [NSString localizedUserNotificationStringForKey:notification.alertTitle arguments:nil];
+        content.body = [NSString localizedUserNotificationStringForKey:notification.alertBody
+                                                             arguments:nil];
+        content.sound = [UNNotificationSound defaultSound];
 
-    if (notification) {
-        NSString* args = [notification encodeToJSON];
+        /// 4. update application icon badge numberß
+        //content.badge = @([[UIApplication sharedApplication] applicationIconBadgeNumber] + 1);
 
-        params = [NSString stringWithFormat:
-                  @"%@,'%@'",
-                  args, self.applicationState];
-    }
+        //        //Deliver the notification at 08:30 everyday
+        //        NSDateComponents *dateComponents = [[NSDateComponents alloc] init];
+        //        dateComponents.hour = 8;
+        //        dateComponents.minute = 30;
+        //        UNCalendarNotificationTrigger *trigger = [UNCalendarNotificationTrigger triggerWithDateMatchingComponents:dateComponents repeats:YES];
 
-    js = [NSString stringWithFormat:
-          @"cordova.plugins.notification.local.core.fireEvent('%@', %@)",
-          event, params];
+        // Deliver the notification at specified date and time
+        // setup to convert NSDate object to NSDateComponents
+        unsigned unitFlags = NSCalendarUnitYear | NSCalendarUnitMonth |  NSCalendarUnitDay |  NSCalendarUnitHour |  NSCalendarUnitMinute;
+        NSDate *fireDate = notification.fireDate;
 
-    if (deviceready) {
-        [self.commandDelegate evalJs:js];
+        NSCalendar *cal = [NSCalendar currentCalendar];
+        NSDateComponents *dateComponents = [cal components:unitFlags fromDate:fireDate];
+        //        NSDateComponents *dateComponents = [[NSDateComponents alloc] init];
+        //        dateComponents.hour = 8;
+        //        dateComponents.minute = 30;
+        UNCalendarNotificationTrigger *trigger = [UNCalendarNotificationTrigger triggerWithDateMatchingComponents:dateComponents repeats:NO];
+
+        // Deliver the notification in five seconds.
+        // UNTimeIntervalNotificationTrigger *trigger = [UNTimeIntervalNotificationTrigger triggerWithTimeInterval:1.f repeats:NO];
+
+        NSString *notificationID = [NSString stringWithFormat:@"test1%@",content.title];
+        UNNotificationRequest *request = [UNNotificationRequest requestWithIdentifier:notificationID
+                                                                              content:content trigger:trigger];
+        /// 3. schedule localNotification
+        UNUserNotificationCenter *center = [UNUserNotificationCenter currentNotificationCenter];
+        [center addNotificationRequest:request withCompletionHandler:^(NSError * _Nullable error) {
+            if (!error) {
+                NSLog(@"add NotificationRequest %@ %@", content.title, content.body);
+                //, (long)dateComponents.year, (long)dateComponents.month, (long)dateComponents.day, (long)dateComponents.hour, (long)dateComponents.minute);
+            }
+        }];
     } else {
-        [self.eventQueue addObject:js];
+        
+        NSString* js;
+        NSString* params = [NSString stringWithFormat:
+                            @"\"%@\"", self.applicationState];
+        
+        if (notification) {
+            NSString* args = [notification encodeToJSON];
+            
+            params = [NSString stringWithFormat:
+                      @"%@,'%@'",
+                      args, self.applicationState];
+        }
+        
+        js = [NSString stringWithFormat:
+              @"cordova.plugins.notification.local.core.fireEvent('%@', %@)",
+              event, params];
+        
+        if (deviceready) {
+            [self.commandDelegate evalJs:js];
+        } else {
+            [self.eventQueue addObject:js];
+        }
     }
+    
 }
 
 @end
