@@ -153,7 +153,7 @@ NSString* const DEFAULT_SOUND = @"res://platform_default";
     NSString* interval = [dict objectForKey:@"every"];
 
     if ([self stringIsNullOrEmpty:interval]) {
-        return 0;
+        return NSCalendarUnitEra;
     }
     else if ([interval isEqualToString:@"second"]) {
         return NSCalendarUnitSecond;
@@ -180,7 +180,7 @@ NSString* const DEFAULT_SOUND = @"res://platform_default";
         return NSCalendarUnitYear;
     }
 
-    return 0;
+    return NSCalendarUnitEra;
 }
 
 #pragma mark -
@@ -237,15 +237,10 @@ NSString* const DEFAULT_SOUND = @"res://platform_default";
  */
 - (BOOL) stringIsNullOrEmpty:(NSString*)str
 {
-//    if (str == (NSString*)[NSNull null])
-//        return YES;
-//
-//    if ([str isEqualToString:@""])
-//        return YES;
-//
-//    return NO;
+    if (str == (NSString*)[NSNull null])
+        return YES;
 
-    if ([str length] == 0)
+    if ([str isEqualToString:@""])
         return YES;
 
     return NO;
