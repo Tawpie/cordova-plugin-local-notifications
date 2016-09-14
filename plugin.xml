@@ -3,7 +3,7 @@
 <plugin xmlns="http://apache.org/cordova/ns/plugins/1.0"
         xmlns:android="http://schemas.android.com/apk/res/android"
         id="de.appplant.cordova.plugin.local-notification"
-        version="0.8.4+ledControl">
+        version="0.8.4+ledControl+spk0611iOS10Changes">
 
     <name>LocalNotification</name>
 
@@ -30,6 +30,9 @@
 
     <!-- info -->
     <info>
+        incorporates https://github.com/spk0611/cordova-plugin-local-notifications#9ad32cf2059cdf9a54b4930b1c58ba76ef7e3a87
+        along with Tawpie led color changes.
+
         Your support is needed. If you use the local-notification plugin please support us in order to ensure further development.
         https://github.com/katzer/cordova-plugin-local-notifications#supporting
 
