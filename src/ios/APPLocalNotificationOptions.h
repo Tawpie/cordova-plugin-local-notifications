@@ -20,9 +20,6 @@
  *
  * @APPPLANT_LICENSE_HEADER_END@
  */
- 
-#import <Foundation/Foundation.h>
-#import <UIKit/UIKit.h>
 
 @interface APPLocalNotificationOptions : NSObject
 

@@ -132,7 +132,7 @@ public class Options {
         if (options.has("iconUri") && !options.optBoolean("updated"))
             return;
 
-        Uri iconUri  = assets.parse(options.optString("icon", "res://icon"));
+        Uri iconUri  = assets.parse(options.optString("icon", "icon"));
         Uri soundUri = assets.parseSound(options.optString("sound", null));
 
         try {
@@ -242,7 +242,7 @@ public class Options {
         String hex = options.optString("led", null);
 
         if (hex == null) {
-            return 0;
+            return NotificationCompat.DEFAULT_LIGHTS;
         }
 
         int aRGB = Integer.parseInt(hex, 16);
